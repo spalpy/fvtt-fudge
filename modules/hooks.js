@@ -51,7 +51,7 @@ const parseTarget = (target) => {
       };
     default:
       return undefined;
-  };
+  }
 };
 
 const parseDialogDoc = (doc) => {
@@ -96,7 +96,7 @@ const onSubmit = async (doc) => {
   }
 
   try {
-    new Roll(formula).roll();
+    await new Roll(formula).roll();
   } catch (e) {
     console.error(e);
     return whisperError("Invalid Formula");
@@ -104,10 +104,10 @@ const onSubmit = async (doc) => {
 
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
     const dice = new Roll(formula);
-    const r = dice.roll();
+    const r = await dice.roll();
     const total = r.total;
     if (evaluateTotalVsTarget(total, target)) {
-      r.toMessage({
+      await r.toMessage({
         speaker: ChatMessage.getSpeaker()
       }, {
         rollMode: "roll"
