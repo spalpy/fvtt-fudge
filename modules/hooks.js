@@ -87,32 +87,40 @@ const evaluateTotalVsTarget = (total, target) => {
 };
 
 const onSubmit = async (doc) => {
-  const { formula, target } = parseDialogDoc(doc);
+  const {formula, target} = parseDialogDoc(doc);
   if (!formula) {
     return whisperError("Missing Formula");
   }
   if (!target || !target.condition) {
     return whisperError("Invalid Target Format");
   }
+  // try {
+  //   await new Roll(formula).evaluate();
+  // } catch (e) {
+  //   console.error(e);
+  //   return whisperError("Invalid Formula");
+  // }
+  await new Roll(formula).evaluate({async: true})
+    .catch(e => {
+      console.error(e);
+      return whisperError("Invalid Formula: " + e)
+    })
 
-  try {
-    await new Roll(formula).roll();
-  } catch (e) {
-    console.error(e);
-    return whisperError("Invalid Formula");
-  }
 
+  console.time("fudgeTimer")
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
     const dice = new Roll(formula);
-    const r = await dice.roll();
+    const r = await dice.evaluate({async: true});
     const total = r.total;
     if (evaluateTotalVsTarget(total, target)) {
       await r.toMessage({
         speaker: ChatMessage.getSpeaker()
       }, {
         rollMode: "roll"
+      }).finally(() => {
+        console.log(`Foundry VTT | Fudge | Fudged in ${i + 1} attempts.`)
+        console.timeEnd("fudgeTimer")
       });
-      console.log(`Foundry VTT | Fudge | Fudged in ${i+1} attempts.`);
       return;
     }
   }
