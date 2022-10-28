@@ -1,5 +1,5 @@
 {
-  "name": "fudge",
+  "id": "fudge",
   "title": "Fudge",
   "description": "fudge yer rolls!",
   "authors": [
@@ -16,5 +16,8 @@
     "lang": "en",
     "name": "English",
     "path": "lang/en.json"
-  }]
+  }],
+  "manifest": "",
+  "url": "",
+  "download": ""
 }
